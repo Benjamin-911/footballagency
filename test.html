@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Page - Football Agency</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #16a34a, #2563eb);
+            color: white;
+        }
+        .container {
+            background: rgba(255,255,255,0.1);
+            padding: 30px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+        h1 { text-align: center; }
+        .success {
+            background: rgba(16,185,129,0.3);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #10b981;
+        }
+        .error {
+            background: rgba(239,68,68,0.3);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid #ef4444;
+        }
+        .btn {
+            display: inline-block;
+            background: white;
+            color: #16a34a;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            margin: 10px 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>✅ Server Test Page</h1>
+        
+        <div class="success">
+            <h2>🎉 Congratulations!</h2>
+            <p>Your web server is working perfectly!</p>
+            <p>If you're seeing this page, Apache is running correctly.</p>
+        </div>
+        
+        <h3>📂 Your Files Are Located:</h3>
+        <p><strong>Current Directory:</strong></p>
+        <code style="background: rgba(0,0,0,0.3); padding: 5px 10px; border-radius: 5px;">
+            <?php echo __DIR__; ?>
+        </code>
+        
+        <h3>🔗 Next Steps:</h3>
+        <ol>
+            <li>✅ Server working - Confirmed!</li>
+            <li>🔍 Import database using <code>database/schema.sql</code></li>
+            <li>🧪 Test API: <a href="backend/test_api.php" class="btn">Test API</a></li>
+            <li>👀 View database: <a href="database_viewer.html" class="btn">View Database</a></li>
+            <li>🎮 Demo API: <a href="api_demo.html" class="btn">API Demo</a></li>
+        </ol>
+        
+        <div class="success">
+            <h4>📝 Important Notes:</h4>
+            <ul>
+                <li>Make sure MySQL is running</li>
+                <li>Import the database from phpMyAdmin</li>
+                <li>Configure backend/config.php if needed</li>
+            </ul>
+        </div>
+        
+        <h3>🚨 If You See This Page:</h3>
+        <p>Your 404 error was likely due to:</p>
+        <ul>
+            <li>❌ Spaces in folder name</li>
+            <li>❌ Wrong URL format</li>
+            <li>❌ Files not in htdocs/www</li>
+        </ul>
+        
+        <p style="text-align: center; margin-top: 30px;">
+            <strong>You're on the right track! 🚀</strong>
+        </p>
+    </div>
+</body>
+</html>
+

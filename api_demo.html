@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Demo - User Management System</title>
+    <link rel="stylesheet" href="./globals.css">
+    <style>
+        body {
+            background: #f8fafc;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #16a34a;
+            margin-bottom: 30px;
+        }
+        .section {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .btn-api {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            background: #16a34a;
+            color: white;
+        }
+        .btn-api:hover {
+            background: #15803d;
+            transform: translateY(-2px);
+        }
+        .btn-api.get { background: #2563eb; }
+        .btn-api.get:hover { background: #1d4ed8; }
+        .btn-api.post { background: #16a34a; }
+        .btn-api.post:hover { background: #15803d; }
+        .btn-api.put { background: #f59e0b; }
+        .btn-api.put:hover { background: #d97706; }
+        .btn-api.delete { background: #dc2626; }
+        .btn-api.delete:hover { background: #b91c1c; }
+        #output {
+            background: #1e293b;
+            color: #e2e8f0;
+            padding: 20px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        .loading {
+            color: #f59e0b;
+        }
+        .success {
+            color: #10b981;
+        }
+        .error {
+            color: #ef4444;
+        }
+        .method-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+        .method-GET { background: #2563eb; color: white; }
+        .method-POST { background: #16a34a; color: white; }
+        .method-PUT { background: #f59e0b; color: white; }
+        .method-DELETE { background: #dc2626; color: white; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔌 API Demo - CRUD Operations</h1>
+        <p style="text-align: center; color: #64748b; margin-bottom: 40px;">
+            Interactive demonstration of the User Management RESTful API
+        </p>
+
+        <div class="section">
+            <h2>GET Operations</h2>
+            <p>Retrieve user data from the database</p>
+            <div class="btn-group">
+                <button class="btn-api get" onclick="getAllUsers()">
+                    📋 GET All Users
+                </button>
+                <button class="btn-api get" onclick="getUserById()">
+                    👤 GET User by ID (1)
+                </button>
+                <button class="btn-api get" onclick="getUsersByRole('Player')">
+                    ⚽ GET Players
+                </button>
+                <button class="btn-api get" onclick="getUsersByRole('Agent')">
+                    🤝 GET Agents
+                </button>
+                <button class="btn-api get" onclick="getUserOverview()">
+                    📊 GET User Overview
+                </button>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>POST Operations</h2>
+            <p>Create new users in the database</p>
+            <div class="btn-group">
+                <button class="btn-api post" onclick="createUser()">
+                    ➕ CREATE New Player
+                </button>
+                <button class="btn-api post" onclick="createAgent()">
+                    ➕ CREATE New Agent
+                </button>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>PUT Operations</h2>
+            <p>Update existing user information</p>
+            <div class="btn-group">
+                <button class="btn-api put" onclick="updateUser()">
+                    ✏️ UPDATE User (ID: 1)
+                </button>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>DELETE Operations</h2>
+            <p>Remove users from the database</p>
+            <div class="btn-group">
+                <button class="btn-api delete" onclick="deleteUser()">
+                    🗑️ DELETE User (ID: Last Created)
+                </button>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📤 API Response Output</h2>
+            <div id="output">Click any button above to test the API...</div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'backend/users.php';
+        let lastCreatedId = null;
+
+        // Display result in output div
+        function displayResult(method, url, data, response, isError = false) {
+            const output = document.getElementById('output');
+            const timestamp = new Date().toLocaleTimeString();
+            const className = isError ? 'error' : 'success';
+            
+            let result = `<span class="method-${method}">${method}</span>`;
+            result += `<span class="${className}">${url}</span>\n`;
+            result += `<span class="loading">[${timestamp}]</span>\n\n`;
+            
+            if (data) {
+                result += `<span class="loading">Request Data:</span>\n`;
+                result += `${JSON.stringify(data, null, 2)}\n\n`;
+            }
+            
+            result += `<span class="${className}">Response:</span>\n`;
+            result += `${JSON.stringify(response, null, 2)}\n`;
+            result += '\n' + '─'.repeat(80) + '\n\n';
+            
+            output.textContent = result + output.textContent;
+        }
+
+        // GET All Users
+        async function getAllUsers() {
+            try {
+                showLoading('Loading all users...');
+                const response = await fetch(`${API_BASE}?action=all`);
+                const data = await response.json();
+                displayResult('GET', 'action=all', null, data);
+            } catch (error) {
+                displayResult('GET', 'action=all', null, {error: error.message}, true);
+            }
+        }
+
+        // GET User by ID
+        async function getUserById() {
+            try {
+                showLoading('Loading user by ID...');
+                const response = await fetch(`${API_BASE}?action=by-id&id=1`);
+                const data = await response.json();
+                displayResult('GET', 'action=by-id&id=1', null, data);
+            } catch (error) {
+                displayResult('GET', 'action=by-id&id=1', null, {error: error.message}, true);
+            }
+        }
+
+        // GET Users by Role
+        async function getUsersByRole(role) {
+            try {
+                showLoading(`Loading ${role}s...`);
+                const response = await fetch(`${API_BASE}?action=by-role&role=${role}`);
+                const data = await response.json();
+                displayResult('GET', `action=by-role&role=${role}`, null, data);
+            } catch (error) {
+                displayResult('GET', `action=by-role&role=${role}`, null, {error: error.message}, true);
+            }
+        }
+
+        // GET User Overview
+        async function getUserOverview() {
+            try {
+                showLoading('Loading user overview...');
+                const response = await fetch(`${API_BASE}?action=overview`);
+                const data = await response.json();
+                displayResult('GET', 'action=overview', null, data);
+            } catch (error) {
+                displayResult('GET', 'action=overview', null, {error: error.message}, true);
+            }
+        }
+
+        // CREATE New Player
+        async function createUser() {
+            const newUser = {
+                name: 'Test Player',
+                email: 'testplayer' + Date.now() + '@example.com',
+                role: 'Player',
+                password: 'test123',
+                phone: '+232 76 999 888'
+            };
+
+            try {
+                showLoading('Creating new player...');
+                const response = await fetch(API_BASE, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(newUser)
+                });
+                const data = await response.json();
+                if (data.user_id) {
+                    lastCreatedId = data.user_id;
+                }
+                displayResult('POST', API_BASE, newUser, data);
+            } catch (error) {
+                displayResult('POST', API_BASE, newUser, {error: error.message}, true);
+            }
+        }
+
+        // CREATE New Agent
+        async function createAgent() {
+            const newAgent = {
+                name: 'Test Agent',
+                email: 'testagent' + Date.now() + '@example.com',
+                role: 'Agent',
+                password: 'test123',
+                phone: '+232 76 999 777'
+            };
+
+            try {
+                showLoading('Creating new agent...');
+                const response = await fetch(API_BASE, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(newAgent)
+                });
+                const data = await response.json();
+                if (data.user_id) {
+                    lastCreatedId = data.user_id;
+                }
+                displayResult('POST', API_BASE, newAgent, data);
+            } catch (error) {
+                displayResult('POST', API_BASE, newAgent, {error: error.message}, true);
+            }
+        }
+
+        // UPDATE User
+        async function updateUser() {
+            const updateData = {
+                id: 1,
+                phone: '+232 76 ' + Math.floor(Math.random() * 999999)
+            };
+
+            try {
+                showLoading('Updating user...');
+                const response = await fetch(API_BASE, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(updateData)
+                });
+                const data = await response.json();
+                displayResult('PUT', API_BASE, updateData, data);
+            } catch (error) {
+                displayResult('PUT', API_BASE, updateData, {error: error.message}, true);
+            }
+        }
+
+        // DELETE User
+        async function deleteUser() {
+            if (!lastCreatedId) {
+                alert('Please create a user first using POST operations');
+                return;
+            }
+
+            try {
+                showLoading('Deleting user...');
+                const response = await fetch(`${API_BASE}?id=${lastCreatedId}`, {
+                    method: 'DELETE'
+                });
+                const data = await response.json();
+                displayResult('DELETE', `id=${lastCreatedId}`, null, data);
+                lastCreatedId = null;
+            } catch (error) {
+                displayResult('DELETE', `id=${lastCreatedId}`, null, {error: error.message}, true);
+            }
+        }
+
+        // Show loading message
+        function showLoading(message) {
+            const output = document.getElementById('output');
+            output.textContent = message + '\n' + output.textContent;
+        }
+
+        // Test on load
+        window.addEventListener('load', () => {
+            const output = document.getElementById('output');
+            output.textContent = 'API Demo ready. Click any button to test CRUD operations.\n\n';
+            output.textContent += 'Note: This demo requires a running web server with the database configured.\n';
+            output.textContent += 'If you see errors, make sure:\n';
+            output.textContent += '1. Apache/MySQL is running\n';
+            output.textContent += '2. Database is imported\n';
+            output.textContent += '3. Backend files are accessible\n\n';
+        });
+    </script>
+</body>
+</html>
+
