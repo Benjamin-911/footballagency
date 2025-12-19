@@ -31,7 +31,7 @@ backend/test_*.php
 backend/debug_*.php
 
 # Actual config file (keep example in repo)
-backend/config.php
+# backend/config.php
 
 # Database files
 *.sql
