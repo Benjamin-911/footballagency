@@ -1,0 +1,7 @@
+{
+    "name": "benjamin-911/footballagency",
+    "description": "Football Agency Management System",
+    "require": {
+        "php": "^7.4 || ^8.0"
+    }
+}
