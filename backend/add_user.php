@@ -1,6 +1,6 @@
 <?php
 // Add this at the top of your add_user.php
-require_once 'db.php'; // Use the simple db.php connection
+require_once 'dbconnect.php'; // Use the simple db.php connection
 require_once 'session.php';
 require_admin();
 

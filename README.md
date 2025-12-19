@@ -4,6 +4,13 @@ A comprehensive football agency management platform built with React frontend an
 
 ## 🎯 Features
 
+> [!NOTE]
+> **Project Structure Overview**: This repository contains two versions of the application:
+> 1. **Root Directory**: A server-side rendered **PHP Application** (Legacy/Monolith).
+> 2. **`frontend/`**: A modern **React Application** that consumes the PHP API from `backend/`.
+>
+> You are currently looking at the documentation for the React version. For the PHP version, see `PROJECT-SUMMARY.md`.
+
 - **User Management**: Four user roles (Admin, Player, Agent, Club Manager)
 - **Role-Based Dashboard**: Customized dashboards for each user type
 - **Opportunities Management**: Agents and Club Managers can create opportunities for Players
